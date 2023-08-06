@@ -16,3 +16,14 @@ class Match():
   
   def get_player(self, char):
     return self._players[char]
+  
+  def get_winner(self, board):
+    """
+    Return the winner and if there isn't one, return None
+    """
+    if board.is_victory('x'):
+      return self.get_player('x')
+    elif board.is_victory('o'):
+      return self.get_player('o')
+    else:
+      return None

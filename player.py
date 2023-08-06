@@ -1,4 +1,5 @@
 from oracle import *
+import random
 
 class Player():
   def __init__(self, name, char = None, opponent = None, oracle = BaseOracle()) -> None:
@@ -6,6 +7,17 @@ class Player():
     self.char = char
     self._oracle = oracle
     self.opponent = opponent
+    self.last_move = None
+
+  @property
+  def opponent(self):
+    return self._opponent
+
+  @opponent.setter
+  def opponent(self, other):
+    if other != None:
+      self._opponent = other
+      other._opponent = self
 
   def play(self, board):
     """
@@ -20,6 +32,8 @@ class Player():
   def _play_on(self, board, position):
     # Play in the position
     board.add(self.char, position)
+    # Store the last move
+    self.last_move = position
 
   def _ask_oracle(self, board):
     """
@@ -36,10 +50,10 @@ class Player():
     # We remove the additional
     valid = list(filter(lambda x : x.classification != ColumnClassification.FULL, recommendations))
     # Select the best option in the recommendation list
-    return valid[0]
+    return random.choice(valid)
   
 class HumanPlayer(Player):
-  def __init__(self, name, char):
+  def __init__(self, name, char=None):
     super().__init__(name, char)
 
   def _ask_oracle(self, board):

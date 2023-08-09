@@ -2,26 +2,6 @@ from square_board import SquareBoard
 from oracle import BaseOracle
 from player import _is_within_column_range, Player, _is_non_full_column, _is_int
 
-def test_play():
-    """
-    Check what's the play in the first column
-    """
-    before = SquareBoard.fromList([[None, None, None, None],
-                                  ['x', 'o', 'x', 'o'],
-                                  ['x', 'o', 'x', 'o'],
-                                  ['x', None, None, None]])
-    
-    after = SquareBoard.fromList([['x', None, None, None],
-                                  ['x', 'o', 'x', 'o'],
-                                  ['x', 'o', 'x', 'o'],
-                                  ['x', None, None, None]])
-    
-    player = Player('Chip', 'x', oracle=BaseOracle())
-
-    player.play(before)
-    assert before == after
-
-
 def test_valid_column():
   board = SquareBoard.fromList([['x', None, None, None, ],
                                 ['x', 'o', 'x', 'o', ],

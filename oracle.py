@@ -1,8 +1,10 @@
 from enum import Enum, auto
+from copy import deepcopy
 
 class ColumnClassification(Enum):
-  FULL = auto()
-  MAYBE = auto()
+  FULL = -1 # Impossible
+  MAYBE = 1 # Undesirable
+  WIN = 100 # The best choice: It win for a mile
 
 class ColumnRecommendation():
   def __init__(self, index, classification):
@@ -14,9 +16,9 @@ class ColumnRecommendation():
     # If they're from different objects, they're different
     if not isinstance(other, self.__class__):
       return False
-    # If they're from the same class, compare the properties of both
+    # Only matters the classification
     else:
-      return (self.index, self.classification) == (other.index, other.classification)
+      return self.classification == other.classification
     
   def __hash__(self) -> int:
     return hash((self.index, self.classification))
@@ -37,3 +39,36 @@ class BaseOracle():
     if board._columns[index].is_full():
       classification = ColumnClassification.FULL
     return ColumnRecommendation(index, classification)
+  
+class SmartOracle(BaseOracle):
+  def _get_column_recommendation(self, board, index, player):
+    """
+    Tune the classification of super and try to find win columns
+    """
+    recommendation = super().get_recommendation(board, index, player)
+    if recommendation.classification == ColumnClassification.MAYBE:
+      # It can be improve
+      recommendation = self._is_winning_move(board, index, player)
+    return recommendation
+  
+  def _is_winning_move(self, board, index, player):
+    """
+    Determinate if playing in a position, give a immediate victory
+    """
+    # Make a copy of the board
+    # Play on it
+    tmp = self._play_on_tmp_board(board, index, player)
+
+    # Determinate if there's a player victory or not
+    return tmp.is_victory(player.char)
+  
+  def _play_on_tmp_board(self, board, index, player):
+    """
+    Make a copy of the board and play on it
+    """
+    tmp = deepcopy(board)
+
+    tmp.add(player.char, index)
+
+    # Return the modifies copy
+    return tmp

@@ -1,5 +1,6 @@
 from oracle import *
 import random
+from list_util import *
 
 class Player():
   def __init__(self, name, char = None, opponent = None, oracle = BaseOracle()) -> None:
@@ -49,8 +50,16 @@ class Player():
   def _choose(self, recommendations):
     # We remove the additional
     valid = list(filter(lambda x : x.classification != ColumnClassification.FULL, recommendations))
-    # Select the best option in the recommendation list
-    return random.choice(valid)
+    # Order by the value of classification
+    valid = sorted(valid, key=lambda x : x.classification.value, reverse=True)
+    # If all the choices are the same, pick one random
+    if all_same(valid):
+      return random.choice(valid)
+
+    else:
+    # If there're different, select the more valuable (which is going to be the first)
+      return valid[0]
+
   
 class HumanPlayer(Player):
   def __init__(self, name, char=None):

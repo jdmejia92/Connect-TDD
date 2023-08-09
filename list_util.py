@@ -87,3 +87,9 @@ def reverse_list(l):
 
 def reverse_matrix(matrix):
   return list(map(lambda x: reverse_list(x), matrix))
+
+def all_same(test_list):
+  """
+  Return True if all the elements in the list are the same or empty
+  """
+  return all(test_list[0] == value for value in test_list)

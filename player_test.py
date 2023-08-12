@@ -37,3 +37,6 @@ def test_is_int():
   assert _is_int('hola') == False
   assert _is_int('') == False
   assert _is_int('3.14') == False
+
+def test_help():
+  pass

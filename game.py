@@ -6,6 +6,7 @@ from square_board import SquareBoard
 from list_util import reverse_matrix
 from beautifultable import BeautifulTable
 from settings import BOARD_LENGTH
+from oracle import *
 
 
 class RoundType(Enum):
@@ -48,7 +49,15 @@ class Game:
       # Get the current player
       current_player = self.match.next_player
       # Make it play
-      current_player.play(self.board)
+      ask_help = current_player.play(self.board)
+      # Check if the player asked for help
+      while ask_help:
+        # Display help
+        self.display_help(ask_help)
+        # Make the player play
+        another_help = current_player.play(self.board)
+        if type(another_help) != list:
+          break
       # Show the play
       self.display_move(current_player)
       # Print the board
@@ -60,6 +69,11 @@ class Game:
         # End the loop
         break
 
+  def display_help(self, list_help):
+    bt = BeautifulTable()
+    bt.rows.append(list_help)
+    bt.columns.header = [str(i) for i in range(BOARD_LENGTH)]
+    print(bt)
   
   def display_move(self, player):
     print(f'\n{player.name} ({player.char}) has moved in column {player.last_move}')
@@ -109,8 +123,36 @@ class Game:
     # Define type of game (asking the user)
     self.round_type = self._get_round_type()
 
+    # Ask the difficulty level
+    if self.round_type == RoundType.COMPUTER_VS_HUMAN:
+      self._difficulty_level = self._get_difficulty_level()
+
     # Create the game
     self.match = self._make_match()
+
+  def _get_difficulty_level(self):
+    """
+    Ask the player how smart wanted his opponent to be
+    """
+    print("""
+    Chose your opponent, human:
+    
+    1) Bender: for clowns and wimps
+    2) T-800: you may regret it
+    3) T-1000: Don't even think about it!
+    """)
+    while True:
+      response = input('Please type 1, 2 or 3: ').strip()
+      if response == '1':
+        level = DifficultyLevel.LOW
+        break
+      elif response == '2':
+        level = DifficultyLevel.MEDIUM
+        break
+      else:
+        level = DifficultyLevel.HIGH
+        break
+    return level
 
   def _get_round_type(self):
     """
@@ -134,13 +176,17 @@ class Game:
     """
     Player 1 always robot
     """
+    _levels = {DifficultyLevel.LOW : BaseOracle(),
+              DifficultyLevel.MEDIUM : SmartOracle(),
+              DifficultyLevel.HIGH : SmartOracle()}
+    
     if self.round_type == RoundType.COMPUTER_VS_COMPUTER:
       # Both players robotics
-      player1 = Player('T-X')
-      player2 = Player('T-1000')
+      player1 = Player('T-X', oracle=SmartOracle())
+      player2 = Player('T-1000', oracle=SmartOracle())
     else:
       # Computer vs human
-      player1 = Player('T-800')
+      player1 = Player('T-800', oracle=_levels[self._difficulty_level])
       player2 = HumanPlayer(name=input('Enter your name, puny human: '))
 
     return Match(player1, player2)

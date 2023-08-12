@@ -1,9 +1,13 @@
 from enum import Enum, auto
 from copy import deepcopy
+from settings import BOARD_LENGTH
 
 class ColumnClassification(Enum):
+  def __str__(self) -> str:
+    return str(self.name).lower()
   FULL = -1 # Impossible
-  MAYBE = 1 # Undesirable
+  LOSE = 1 # Very undesirable
+  MAYBE = 10 # Undesirable
   WIN = 100 # The best choice: It win for a mile
 
 class ColumnRecommendation():
@@ -22,6 +26,9 @@ class ColumnRecommendation():
     
   def __hash__(self) -> int:
     return hash((self.index, self.classification))
+  
+  def __repr__(self) -> str:
+    return f'{self.classification}'
 
 class BaseOracle():
 
@@ -45,11 +52,28 @@ class SmartOracle(BaseOracle):
     """
     Tune the classification of super and try to find win columns
     """
-    recommendation = super().get_recommendation(board, index, player)
+    recommendation = super()._get_column_recommendation(board, index, player)
     if recommendation.classification == ColumnClassification.MAYBE:
       # It can be improve
-      recommendation = self._is_winning_move(board, index, player)
+      if self._is_winning_move(board, index, player):
+        recommendation.classification = ColumnClassification.WIN
+      elif self._is_losing_move(board, index, player):
+        recommendation.classification = ColumnClassification.LOSE
     return recommendation
+  
+  def _is_losing_move(self, board, index, player):
+    """
+    If player make a move in index, it will generate a winning move to the player in any other column?
+    """
+    tmp = self._play_on_tmp_board(board, index, player)
+
+    will_lose = False
+    for i in range(0, BOARD_LENGTH):
+      if self._is_winning_move(tmp, i, player.opponent):
+        will_lose = True
+        break
+    return will_lose
+
   
   def _is_winning_move(self, board, index, player):
     """

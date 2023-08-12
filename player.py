@@ -26,9 +26,11 @@ class Player():
     """
     # Ask the oracle
     (best, recommendations) = self._ask_oracle(board)
-
-    # Play in the best
-    self._play_on(board, best.index)
+    if best == "h":
+      return recommendations
+    else:
+      # Play in the best
+      self._play_on(board, best.index)
 
   def _play_on(self, board, position):
     # Play in the position
@@ -59,7 +61,12 @@ class Player():
     else:
     # If there're different, select the more valuable (which is going to be the first)
       return valid[0]
-
+    
+  def _get_help(self, board, oracle):
+    """
+    Return help for the player
+    """
+    return oracle.get_recommendation(board, self)
   
 class HumanPlayer(Player):
   def __init__(self, name, char=None):
@@ -71,14 +78,15 @@ class HumanPlayer(Player):
     """
     while True:
       # Ask column to the human
-      raw = input('Select a column, puny human: ')
+      raw = input('Select a column, puny human (or h for help): ')
       # Verified the answer
       if _is_int(raw) and _is_within_column_range(board, int(raw)) and _is_non_full_column(board, int(raw)):
-
         # if is_valid, made the play and break the while
         pos = int(raw)
         return (ColumnRecommendation(pos, None), None)
-  
+      elif raw == 'h':
+        return ('h', self._get_help(board, SmartOracle()))
+
 def _is_within_column_range(board, num):
   return num >= 0 and num < len(board)
 
@@ -87,7 +95,7 @@ def _is_non_full_column(board, num):
 
 def _is_int(char):
   try:
-    number = int(char)
+    int(char)
     return True
   except:
     return False

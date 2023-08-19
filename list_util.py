@@ -93,3 +93,27 @@ def all_same(test_list):
   Return True if all the elements in the list are the same or empty
   """
   return all(test_list[0] == value for value in test_list)
+
+def collapse_list(list_to_collapse, empty = '.'):
+  """
+  Concatenate all the string of a list into one string
+  """
+  return ''.join(list(map(lambda x : empty if x == None else str(x), list_to_collapse)))
+
+def collapse_matrix(matrix_to_collapse, empty = '.', fence = '|'):
+  """
+  Concatenate all the strings in a matrix into a string
+  """
+  return fence.join(list(map(lambda x : collapse_list(x, empty), matrix_to_collapse)))
+
+def replace_all_in_list(l, char_to_replace, new_char):
+  """
+  Replace a char in a list
+  """
+  return list(map(lambda x : new_char if x == char_to_replace else x, l))
+
+def replace_all_in_matrix(matrix, char_to_replace, new_char):
+  """
+  Replace a char in a list of lists
+  """
+  return list(map(lambda x : replace_all_in_list(x, char_to_replace, new_char), matrix)) 

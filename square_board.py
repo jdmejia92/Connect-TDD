@@ -1,5 +1,6 @@
 from linear_board import LinearBoard
-from list_util import transpose, displace_matrix, reverse_matrix
+from list_util import transpose, displace_matrix, reverse_matrix, collapse_matrix
+from string_utils import *
 from settings import *
 
 class SquareBoard():
@@ -17,7 +18,23 @@ class SquareBoard():
     board = cls()
     board._columns = list(map(lambda element: LinearBoard.fromList(element), list_of_lists))
     return board
-
+  
+  @classmethod
+  def fromBoardCode(cls, board_code):
+    return cls.fromBoardRawCode(board_code.raw_code)
+  
+  @classmethod
+  def fromBoardRawCode(cls, board_raw_code):
+    """
+    Transform a string in BoardCode format into a LinearBoard and then
+    make it a SquareBoard
+    """
+    # 1. Convert the code string into a list of strings
+    # 2. Transform each string into a list of char
+    # 3. Changed all the occurrences of . in None
+    # 4. Transform this list in a SquareBoard
+    pass
+  
   # dunders
   def __init__(self):
     self._columns = [LinearBoard() for i in range(BOARD_LENGTH)]
@@ -45,6 +62,9 @@ class SquareBoard():
     for lb in self._columns:
       result = result and lb.is_full()
     return result
+  
+  def as_code(self):
+    return BoardCode(self)
   
   def as_matrix(self):
     """
@@ -89,5 +109,25 @@ class SquareBoard():
     # created a temp board
     tmp = SquareBoard.fromList(displaced)
     # found out if there's a horizontal victory
-    return tmp._any_horizontal_victory(play)
+    return tmp._any_horizontal_victory(play)  
+
+class BoardCode:
+  def __init__(self, board) -> None:
+    self._raw_code = collapse_matrix(board.as_matrix())
+
+  @property
+  def raw_code(self):
+    return self._raw_code
   
+  def __eq__(self, other) -> bool:
+    if not isinstance(other, self):
+      return False
+    else:
+      # Only matters the raw_code
+      return self.raw_code == other.raw_code
+    
+  def __hash__(self) -> int:
+    return hash(self.raw_code)
+  
+  def __repr__(self) -> str:
+    return f'{self.__class__} : {self.raw_code}'

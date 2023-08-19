@@ -4,7 +4,8 @@ from settings import BOARD_LENGTH
 
 class ColumnClassification(Enum):
   def __str__(self) -> str:
-    return str(self.name).lower()
+    return self.name.lower()  
+
   FULL = -1 # Impossible
   LOSE = 1 # Very undesirable
   MAYBE = 10 # Undesirable

@@ -1,3 +1,4 @@
+from typing import Any
 from settings import BOARD_LENGTH, VICTORY_STRIKE
 from list_util import find_streak
 
@@ -22,7 +23,7 @@ class LinearBoard():
     A list of None
     """
     self._column = [None for i in range(BOARD_LENGTH)]
-
+  
   def __eq__(self, other) -> bool:
     if not isinstance(other, self.__class__):
       return False

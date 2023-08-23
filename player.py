@@ -1,6 +1,7 @@
 from oracle import *
 import random
 from list_util import *
+from move import Move
 
 class Player():
   def __init__(self, name, char = None, opponent = None, oracle = BaseOracle()) -> None:
@@ -8,7 +9,7 @@ class Player():
     self.char = char
     self._oracle = oracle
     self.opponent = opponent
-    self.last_move = None
+    self.last_moves = []
 
   @property
   def opponent(self):
@@ -30,13 +31,19 @@ class Player():
       return recommendations
     else:
       # Play in the best
-      self._play_on(board, best.index)
+      self._play_on(board, best.index, recommendations)
 
-  def _play_on(self, board, position):
+  def on_win(self):
+    pass
+
+  def on_lose(self):
+    pass
+
+  def _play_on(self, board, position, recommendations):
     # Play in the position
     board.add(self.char, position)
-    # Store the last move
-    self.last_move = position
+    # Store the last move, always at the beginning of the list
+    self.last_moves.insert(0, Move(position, board.as_code(), recommendations, self))
 
   def _ask_oracle(self, board):
     """
@@ -63,10 +70,7 @@ class Player():
       return valid[0]
     
   def _get_help(self, board, oracle):
-    """
-    Return help for the player
-    """
-    return oracle.get_recommendation(board, self)
+    pass
   
 class HumanPlayer(Player):
   def __init__(self, name, char=None):
@@ -85,8 +89,25 @@ class HumanPlayer(Player):
         pos = int(raw)
         return (ColumnRecommendation(pos, None), None)
       elif raw == 'h':
-        return ('h', self._get_help(board, SmartOracle()))
+        return ('h', self._get_help(board, LearningOracle()))
+      
+  def _get_help(self, board, oracle):
+    """
+    Return help for the player
+    """
+    return oracle.get_recommendation(board, self)
 
+class ReportingPlayer(Player):
+
+  def on_lose(self):
+    """
+    Ask oracle to review its recommendations
+    """
+    self._oracle.backtrack(self.last_moves)
+
+
+
+# Functions to validate the column index
 def _is_within_column_range(board, num):
   return num >= 0 and num < len(board)
 

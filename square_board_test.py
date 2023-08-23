@@ -48,7 +48,7 @@ def test_board_code():
   
   code = board.as_code()
 
-  clone_board = SquareBoard.fromBoardCode(code)
+  clone_board = SquareBoard.fromBoardCode(code.raw_code)
 
   assert clone_board == board
   assert clone_board.as_code() == code

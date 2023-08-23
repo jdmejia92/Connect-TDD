@@ -60,3 +60,17 @@ def test_is_winning_move():
     assert oracle._is_winning_move(almost, i, loser) == False
   
   assert oracle._is_winning_move(almost, 2, winner)
+
+def test_no_good_options():
+  x = Player('xavier', char='x')
+  o = Player('Otto', char='o', opponent=x)
+
+  oracle = SmartOracle()
+
+  maybe = SquareBoard.fromBoardCode('....|o...|....|....')
+  bad_and_full = SquareBoard.fromBoardCode('x...|oo..|o...|xoxo')
+  all_bad = SquareBoard.fromBoardCode('x...|oo..|o...|....')
+
+  assert oracle.no_good_options(maybe, x) == False
+  assert oracle.no_good_options(bad_and_full, x)
+  assert oracle.no_good_options(all_bad, x)

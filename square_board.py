@@ -1,5 +1,5 @@
 from linear_board import LinearBoard
-from list_util import transpose, displace_matrix, reverse_matrix, collapse_matrix
+from list_util import transpose, displace_matrix, reverse_matrix, collapse_matrix, replace_all_in_matrix
 from string_utils import *
 from settings import *
 
@@ -21,7 +21,7 @@ class SquareBoard():
   
   @classmethod
   def fromBoardCode(cls, board_code):
-    return cls.fromBoardRawCode(board_code.raw_code)
+    return cls.fromBoardRawCode(board_code)
   
   @classmethod
   def fromBoardRawCode(cls, board_raw_code):
@@ -30,10 +30,16 @@ class SquareBoard():
     make it a SquareBoard
     """
     # 1. Convert the code string into a list of strings
+    list_of_strings = board_raw_code.split('|')
+
     # 2. Transform each string into a list of char
+    matrix = explode_list_of_strings(list_of_strings)
+
     # 3. Changed all the occurrences of . in None
+    matrix = replace_all_in_matrix(matrix, '.', None)
+    
     # 4. Transform this list in a SquareBoard
-    pass
+    return cls.fromList(matrix)
   
   # dunders
   def __init__(self):
@@ -120,7 +126,7 @@ class BoardCode:
     return self._raw_code
   
   def __eq__(self, other) -> bool:
-    if not isinstance(other, self):
+    if not isinstance(other, self.__class__):
       return False
     else:
       # Only matters the raw_code

@@ -1,6 +1,6 @@
 from square_board import SquareBoard
 from oracle import BaseOracle, SmartOracle, ColumnClassification, ColumnRecommendation
-from player import _is_within_column_range, Player, _is_non_full_column, _is_int
+from player import _is_within_column_range, Player, _is_non_full_column, _is_int, HumanPlayer
 from match import Match
 
 def test_valid_column():
@@ -52,11 +52,11 @@ def test_get_help():
                                     ['o', 'o', 'x', None],
                                     ['x', 'x', None, None]])
 
-  otto = Player('Otto')
+  otto = HumanPlayer('Otto')
   xavier = Player('xavier')
 
   first_match = Match(xavier, otto)
 
   assert otto._get_help(empty_board, SmartOracle()) == [ColumnRecommendation(0, ColumnClassification.MAYBE), ColumnRecommendation(1, ColumnClassification.MAYBE), ColumnRecommendation(2, ColumnClassification.MAYBE), ColumnRecommendation(3, ColumnClassification.MAYBE)]
-  assert otto._get_help(lose_board, SmartOracle()) == [ColumnRecommendation(0, ColumnClassification.MAYBE), ColumnRecommendation(1, ColumnClassification.LOSE), ColumnRecommendation(2, ColumnClassification.LOSE), ColumnRecommendation(3, ColumnClassification.LOSE)]
-  assert otto._get_help(win_board, SmartOracle()) == [ColumnRecommendation(0, ColumnClassification.WIN), ColumnRecommendation(1, ColumnClassification.WIN), ColumnRecommendation(2, ColumnClassification.LOSE), ColumnRecommendation(3, ColumnClassification.MAYBE)]
+  assert otto._get_help(lose_board, SmartOracle()) == [ColumnRecommendation(0, ColumnClassification.MAYBE), ColumnRecommendation(1, ColumnClassification.BAD), ColumnRecommendation(2, ColumnClassification.BAD), ColumnRecommendation(3, ColumnClassification.BAD)]
+  assert otto._get_help(win_board, SmartOracle()) == [ColumnRecommendation(0, ColumnClassification.WIN), ColumnRecommendation(1, ColumnClassification.WIN), ColumnRecommendation(2, ColumnClassification.BAD), ColumnRecommendation(3, ColumnClassification.MAYBE)]

@@ -1,7 +1,7 @@
 import pyfiglet
 from enum import Enum, auto
 from match import Match
-from player import Player, HumanPlayer, ReportingPlayer
+from player import HumanPlayer, ReportingPlayer
 from square_board import SquareBoard
 from list_util import reverse_matrix
 from beautifultable import BeautifulTable
@@ -49,27 +49,33 @@ class Game:
       # Get the current player
       current_player = self.match.next_player
       # Make it play
-      ask_help = current_player.play(self.board)
+      current_player.play(self.board)
       # Check if the player asked for help
-      while ask_help:
+      """ while ask_help:
         # Display help
-        self.display_help(ask_help)
+        self.display_recommendations(ask_help)
         # Make the player play
         another_help = current_player.play(self.board)
         if type(another_help) != list:
-          break
+          break """
       # Show the play
       self.display_move(current_player)
       # Print the board
       self.display_board()
-      # If the game has ended
-      if self._is_game_over():
+      # If there is a winner or tie
+      if self._has_winner_or_tie():
         # Show the final result
         self.display_result()
-        # End the loop
-        break
 
-  def display_help(self, list_help):
+        if self.match.is_match_over():
+          # the game has ended
+          break
+        else:
+          # Reset the board
+          self.board = SquareBoard()
+          self.display_board()
+
+  def display_recommendations(self, list_help):
     bt = BeautifulTable()
     bt.rows.append(list_help)
     bt.columns.header = [str(i) for i in range(BOARD_LENGTH)]
@@ -102,7 +108,7 @@ class Game:
     else:
       print(f'\nA tie between {self.match.get_player("x").name} (x) and {self.match.get_player("o")} (o)')
 
-  def _is_game_over(self):
+  def _has_winner_or_tie(self):
     """
     The game is over when there's a winner or a tie
     """

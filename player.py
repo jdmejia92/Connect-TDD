@@ -2,6 +2,8 @@ from oracle import *
 import random
 from list_util import *
 from move import Move
+from beautifultable import BeautifulTable
+from settings import DEBUG
 
 class Player():
   def __init__(self, name, char = None, opponent = None, oracle = BaseOracle()) -> None:
@@ -27,11 +29,15 @@ class Player():
     """
     # Ask the oracle
     (best, recommendations) = self._ask_oracle(board)
-    if best == "h":
-      return recommendations
-    else:
-      # Play in the best
-      self._play_on(board, best.index, recommendations)
+    # Play in the best
+    self._play_on(board, best.index, recommendations)
+
+  def display_recommendations(self, board):
+    recommendations = self._oracle.get_recommendation(board, self)
+    bt = BeautifulTable()
+    bt.rows.append(recommendations)
+    bt.columns.header = [str(i) for i in range(BOARD_LENGTH)]
+    print(bt)
 
   def on_win(self):
     pass
@@ -40,6 +46,10 @@ class Player():
     pass
 
   def _play_on(self, board, position, recommendations):
+    # Print the recs in case of DEBUG
+    if DEBUG:
+      self.display_recommendations(board)
+
     # Play in the position
     board.add(self.char, position)
     # Store the last move, always at the beginning of the list
@@ -68,12 +78,10 @@ class Player():
     else:
     # If there're different, select the more valuable (which is going to be the first)
       return valid[0]
-    
-  def _get_help(self, board, oracle):
-    pass
   
 class HumanPlayer(Player):
-  def __init__(self, name, char=None):
+  def __init__(self, name, char=None, oracle = LearningOracle()):
+    self.human_oracle = oracle
     super().__init__(name, char)
 
   def _ask_oracle(self, board):
@@ -88,14 +96,15 @@ class HumanPlayer(Player):
         # if is_valid, made the play and break the while
         pos = int(raw)
         return (ColumnRecommendation(pos, None), None)
-      elif raw == 'h':
-        return ('h', self._get_help(board, LearningOracle()))
-      
-  def _get_help(self, board, oracle):
-    """
-    Return help for the player
-    """
-    return oracle.get_recommendation(board, self)
+      elif raw == "h":
+        self.display_help(board)
+
+  def display_help(self, board):
+    recommendations = self.human_oracle.get_recommendation(board, self)
+    bt = BeautifulTable()
+    bt.rows.append(recommendations)
+    bt.columns.header = [str(i) for i in range(BOARD_LENGTH)]
+    print(bt)
 
 class ReportingPlayer(Player):
 
@@ -104,7 +113,6 @@ class ReportingPlayer(Player):
     Ask oracle to review its recommendations
     """
     self._oracle.backtrack(self.last_moves)
-
 
 
 # Functions to validate the column index

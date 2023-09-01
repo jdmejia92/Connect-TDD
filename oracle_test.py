@@ -5,15 +5,17 @@ from settings import BOARD_LENGTH
 
 
 def test_base_oracle():
-  board = SquareBoard.fromList([[None, None, None, None],
-                                ['x', 'o', 'x', 'o'],
-                                ['o', 'o', 'x', 'x'],
-                                ['o', None, None, None]])
+  board = SquareBoard.fromList([[None, None, None, None, None],
+                                ['x', 'o', 'x', 'o', 'o'],
+                                ['o', 'o', 'x', 'x', 'x'],
+                                ['o', None, None, None, None],
+                                ['x', 'o', None, None, None]])
   
   expected = [ColumnRecommendation(0, ColumnClassification.MAYBE),
               ColumnRecommendation(1, ColumnClassification.FULL),
               ColumnRecommendation(2, ColumnClassification.FULL),
-              ColumnRecommendation(3, ColumnClassification.MAYBE)]
+              ColumnRecommendation(3, ColumnClassification.MAYBE),
+              ColumnRecommendation(4, ColumnClassification.MAYBE)]
   
   rappel = BaseOracle()
 
@@ -43,10 +45,11 @@ def test_is_winning_move():
   loser = Player('Otto', 'o')
 
   empty = SquareBoard()
-  almost = SquareBoard.fromList([['o', 'x', 'o', None], 
-                                ['o', 'x', 'o', None],
-                                ['x', None, None, None],
-                                [None, None, None, None]])
+  almost = SquareBoard.fromList([['o', 'x', 'o', None, None], 
+                                ['o', 'x', 'o', None, None],
+                                ['x', None, None, None, None],
+                                ['o', 'x', None, None, None],
+                                [None, None, None, None, None]])
   
   oracle = SmartOracle()
 
@@ -67,9 +70,9 @@ def test_no_good_options():
 
   oracle = SmartOracle()
 
-  maybe = SquareBoard.fromBoardCode('....|o...|....|....')
-  bad_and_full = SquareBoard.fromBoardCode('x...|oo..|o...|xoxo')
-  all_bad = SquareBoard.fromBoardCode('x...|oo..|o...|....')
+  maybe = SquareBoard.fromBoardCode('.....|o....|.....|.....|.....')
+  bad_and_full = SquareBoard.fromBoardCode('xx...|ooo..|o....|xoxox|xoxxo')
+  all_bad = SquareBoard.fromBoardCode('xxo..|ooo..|oox..|oxx..|.....')
 
   assert oracle.no_good_options(maybe, x) == False
   assert oracle.no_good_options(bad_and_full, x)

@@ -8,7 +8,8 @@ class ColumnClassification(Enum):
     return self.name.lower()  
 
   FULL = -1 # Impossible
-  BAD = 1 # Very undesirable
+  LOSE = 1 # Imminent defeat
+  BAD = 5 # Very undesirable
   MAYBE = 10 # Undesirable
   WIN = 100 # The best choice: It win for a mile
 
@@ -82,7 +83,7 @@ class SmartOracle(BaseOracle):
       if self._is_winning_move(board, index, player):
         recommendation.classification = ColumnClassification.WIN
       elif self._is_losing_move(board, index, player):
-        recommendation.classification = ColumnClassification.BAD
+        recommendation.classification = ColumnClassification.LOSE
     return recommendation
   
   def _is_losing_move(self, board, index, player):
@@ -134,7 +135,7 @@ class MemoizingOracle(SmartOracle):
     """
     The key must merge the board an player, in the most simple way
     """
-    return f'{board_code.raw_code}@{player.char}'
+    return f'{board_code}@{player.char}'
 
   def get_recommendation(self, board, player):
     # Create the key
